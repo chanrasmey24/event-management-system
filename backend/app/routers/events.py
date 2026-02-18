@@ -22,3 +22,28 @@ def create_event(event: schemas.EventBase, user=Depends(get_current_user), db: S
 @router.get("/", response_model=list[schemas.EventOut])
 def list_events(db: Session = Depends(get_db)):
     return db.query(models.Event).all()
+
+@router.post("/", response_model=schemas.RegistrationOut)
+def register_event(
+    data: schemas.RegistrationCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    existing = db.query(models.Registration).filter(
+        models.Registration.user_id == current_user.id,
+        models.Registration.event_id == data.event_id
+    ).first()
+
+    if existing:
+        raise HTTPException(status_code=400, detail="Already registered")
+
+    registration = models.Registration(
+        user_id=current_user.id,
+        event_id=data.event_id
+    )
+
+    db.add(registration)
+    db.commit()
+    db.refresh(registration)
+
+    return registration
