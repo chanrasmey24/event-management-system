@@ -10,12 +10,7 @@ app = FastAPI(title="Smart Campus Event System API")
 # ✅ CRITICAL FIX - Allow frontend to access backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",  # Vite default
-        "http://127.0.0.1:5173",  # Vite alternative
-        "http://localhost:3000",  # React default
-        "http://127.0.0.1:3000",  # React alternative
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
     allow_headers=["*"],  # Allow all headers

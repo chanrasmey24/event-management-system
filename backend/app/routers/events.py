@@ -22,3 +22,22 @@ def create_event(event: schemas.EventBase, user=Depends(get_current_user), db: S
 @router.get("/", response_model=list[schemas.EventOut])
 def list_events(db: Session = Depends(get_db)):
     return db.query(models.Event).all()
+
+@router.delete("/{event_id}")
+def delete_event(
+    event_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    event = db.query(models.Event).filter(models.Event.id == event_id).first()
+
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    db.delete(event)
+    db.commit()
+
+    return {"message": "Event deleted"}

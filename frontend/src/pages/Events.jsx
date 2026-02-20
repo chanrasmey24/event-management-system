@@ -27,4 +27,14 @@ export default function Events() {
       ))}
     </div>
   )
+
+  {localStorage.getItem('role') === 'admin' && (
+  <button onClick={() => deleteEvent(e.id)}>Delete</button>
+)}
+const deleteEvent = async (id) => {
+  await api.delete(`/events/${id}`)
+  loadEvents()
+}
+
+
 }
